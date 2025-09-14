@@ -1,0 +1,70 @@
+@using EventEase.Shared
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="card my-2 p-2">
+@if (!IsEditable)
+{
+<h4>@Event.Name</h4>
+<div><strong>Date:</strong> @Event.Date.ToString("yyyy-MM-dd")</div>
+<div><strong>Location:</strong> @Event.Location</div>
+}
+else
+{
+<EditForm Model="editModel" OnValidSubmit="SaveAsync">
+<div class="mb-2">
+<label>Name</label>
+<InputText @bind-Value="editModel.Name" class="form-control" />
+</div>
+<div class="mb-2">
+<label>Date</label>
+<InputDate @bind-Value="editModel.Date" class="form-control" />
+</div>
+<div class="mb-2">
+<label>Location</label>
+<InputText @bind-Value="editModel.Location" class="form-control" />
+</div>
+<button type="submit" class="btn btn-primary">Save</button>
+<button type="button" class="btn btn-link" @onclick="Cancel">Cancel</button>
+</EditForm>
+}
+</div>
+
+@code {
+[Parameter] public EventModel Event { get; set; } = new EventModel();
+[Parameter] public EventCallback<EventModel> EventChanged { get; set; }
+[Parameter] public bool IsEditable { get; set; } = false;
+
+
+private EventModel editModel = new EventModel();
+
+
+protected override void OnParametersSet()
+{
+// copy to editModel so changes are applied only on Save
+editModel = new EventModel
+{
+Id = Event.Id,
+Name = Event.Name,
+Date = Event.Date,
+Location = Event.Location
+};
+}
+
+
+private async Task SaveAsync()
+{
+Event.Name = editModel.Name;
+Event.Date = editModel.Date;
+Event.Location = editModel.Location;
+if (EventChanged.HasDelegate)
+{
+await EventChanged.InvokeAsync(Event);
+}
+}
+
+
+private void Cancel()
+{
+OnParametersSet();
+}
+}

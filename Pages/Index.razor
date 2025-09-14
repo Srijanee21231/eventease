@@ -1,0 +1,49 @@
+@page "/"
+@using EventEase.Shared
+@inject EventEase.Services.EventService EventService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Events - EventEase</PageTitle>
+
+<h3>Events</h3>
+
+@if (events == null)
+{
+    <p>Loading...</p>
+}
+else if (!events.Any())
+{
+    <p>No events available.</p>
+}
+else
+{
+    <Virtualize Items="events" Context="ev" ItemSize="140">
+        <div class="p-2">
+            <div class="card mb-2 p-2">
+                <h5>@ev.Name</h5>
+                <div><strong>Date:</strong> @ev.Date.ToString("yyyy-MM-dd")</div>
+                <div><strong>Location:</strong> @ev.Location</div>
+                <div class="mt-2">
+                    <button class="btn btn-link" @onclick="@(() => GoToDetails(ev.Id))">Details</button>
+                    <button class="btn btn-link" @onclick="@(() => GoToRegister(ev.Id))">Register</button>
+                </div>
+            </div>
+        </div>
+    </Virtualize>
+}
+
+@code {
+    private List<EventModel>? events;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // default small set
+        events = await EventService.GetEventsAsync();
+
+        // To test performance, uncomment the line below to generate a large dataset:
+        // events = await EventService.GenerateLargeEventListAsync(2000);
+    }
+
+    private void GoToDetails(Guid id) => NavigationManager.NavigateTo("/events/" + id);
+    private void GoToRegister(Guid id) => NavigationManager.NavigateTo("/register/" + id);
+}

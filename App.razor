@@ -1,0 +1,15 @@
+﻿<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <div class="p-4">
+                <h3>Page not found</h3>
+                <p>Sorry — the page you're looking for doesn't exist.</p>
+                <p><a class="btn btn-primary" href="/">Go back to Events</a></p>
+            </div>
+        </LayoutView>
+    </NotFound>
+</Router>

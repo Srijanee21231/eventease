@@ -1,0 +1,50 @@
+@page "/register/{id:guid}"
+@using EventEase.Shared
+@inject EventEase.Services.EventService EventService
+
+<h3>Register for event</h3>
+
+@if (eventItem == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <p>
+        <strong>@eventItem.Name</strong> on @eventItem.Date.ToString("yyyy-MM-dd") at @eventItem.Location
+    </p>
+
+    <EditForm Model="registration" OnValidSubmit="HandleRegistration">
+        <InputText @bind-Value="registration.Name" placeholder="Your name" class="form-control mb-2" />
+        <InputText @bind-Value="registration.Email" placeholder="Email" class="form-control mb-2" />
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </EditForm>
+
+    @if (submitted)
+    {
+        <p class="text-success">Thanks @registration.Name! You are registered.</p>
+    }
+}
+
+@code {
+    [Parameter] public Guid id { get; set; }
+    private EventModel? eventItem;
+    private RegistrationModel registration = new RegistrationModel();
+    private bool submitted = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        eventItem = await EventService.GetEventByIdAsync(id);
+    }
+
+    private void HandleRegistration()
+    {
+        submitted = true;
+    }
+
+    public class RegistrationModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+    }
+}
